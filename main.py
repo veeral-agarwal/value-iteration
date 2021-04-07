@@ -10,10 +10,10 @@ mmstate=["D","R"] #can be D or R
 #calculate all the utilites of state, use joint probability to find where its nexstate.(idk)
 possibility={
     "C" : [["UP",[(0.85,"N"),(0.15,"E")]],["DOWN",[(0.85,"S"),(0.15,"E")]],["STAY",[(0.85,"C"),(0.15,"E")]],["RIGHT",[(1,"E")]],["LEFT",[(0.85,"W"),(0.15,"E")]],["SHOOT",[(0.5,25),(0.5,0)]],["HIT",[(0.1,50),(0.9,0)]]],
-    "N" : [["DOWN",[(0.85,"C"),(0.15,"E")]],["STAY",[(0.85,"N"),(0.15,"E")]],["CRAFT",[(0.5,1),(0.35,2),(0.15,3)]]],
-    "S" : [["UP",[(0.85,"C"),(0.15,"E")]],["STAY",[(0.85,"S"),(0.15,"E")]],["GATHER",[(0.75,1),(0.25,0)]]],
-    "W" : [["RIGHT",[(1,"C")]],["STAY",[(1,"W")]],["SHOOT",[(0.25,25),(0.75,0)]]],
-    "E" : [["LEFT",[(1,"C")]],["STAY",[(1,"E")]],["SHOOT",[(0.9,25),(0.1,0)]],["HIT",[(0.2,50),(0.8,0)]]],
+    "N" : [["CRAFT",[(0.5,1),(0.35,2),(0.15,3)]],["STAY",[(0.85,"N"),(0.15,"E")]],["DOWN",[(0.85,"C"),(0.15,"E")]]],
+    "S" : [["GATHER",[(0.75,1),(0.25,0)]],["UP",[(0.85,"C"),(0.15,"E")]],["STAY",[(0.85,"S"),(0.15,"E")]]],
+    "W" : [["SHOOT",[(0.25,25),(0.75,0)]],["RIGHT",[(1,"C")]],["STAY",[(1,"W")]]],
+    "E" : [["SHOOT",[(0.9,25),(0.1,0)]],["HIT",[(0.2,50),(0.8,0)]],["LEFT",[(1,"C")]],["STAY",[(1,"E")]]],
     "D" : [[0.2,"R"],[0.8,"D"]],
     "R" : [[0.5,"D"],[0.5,"R"]] #this combination of RnD is shoot spot where you have to change ur reward function.
 }
@@ -26,8 +26,24 @@ gamma=0.999
 #probbabilites maynot be idependent in few cases
 # for every iteration take all possible actions and all rewards u get 
 # our step cost is -20
-# gg dude.don't freak out its ok.
-#write for one iteration
+
+def getutility(arr):
+    #print(arr, "is array passed")
+    match=0
+    ind=-1
+    for j in juststates:
+        match=0
+        for i in range(len(arr)):
+            if j[i]==arr[i]:
+                match+=1
+        if match==5:
+            #print(j)
+            ind=juststates.index(j)
+            return gen2utils[ind]   
+    print(arr,"is not found")
+    return 0
+    
+
 def getmax(arr,count):
     temparr=[]
     for i in arr:
@@ -46,46 +62,116 @@ def updateutility(arr,count):
     else:
 
         for act in possibility[arr[0]]:
-            if act[0]=="UP" or act[0]=="DOWN" or act[0]=="RIGHT" or act[0]=="LEFT" or act[0]=="STAY" or act[0]=="GATHER" or (act[0] == "CRAFT" and arr[1]!=0):  
+            if act[0]=="UP" or act[0]=="DOWN" or act[0]=="RIGHT" or act[0]=="LEFT" or act[0]=="STAY" :  
                 util=0
                 if arr[3] == "D":         #move and D
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
-                            util+=indi[0]*mm[0]*(stepcost + gamma*(gen1utils[count]))
+                            nextstate=[indi[1],arr[1],arr[2],mm[1],arr[4]]
+                            util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
                 elif arr[3]=="R":
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
-                            if mm[1]=="D" and (indi[1]=="E" or indi[1]=="C" or indi[1]=="W"):
-                                util+=indi[0]*mm[0]*(stepcost - 40 + gamma*(gen1utils[count]))    #indiana got hit 
+                            if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
+                                nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
+                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
                             else:
-                                util+=indi[0]*mm[0]*(stepcost + gamma*(gen1utils[count]))
+                                nextstate=[indi[1],arr[1],arr[2],mm[1],arr[4]]
+                                util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
                 allaction_utils.append([util,act[0]])
 
-            elif act[0] == "HIT" or (act[0] == "SHOOT" and arr[2] != 0): #hit or shoot is possible
+            elif act[0]=="GATHER":
                 util=0
                 if arr[3] == "D":         #move and D
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
+                            nextstate=[arr[0],min(arr[1]+indi[1],2),arr[2],mm[1],arr[4]]
+                            util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                elif arr[3]=="R":
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
+                                nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
+                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                            else:
+                                nextstate=[arr[0],min(arr[1]+indi[1],2),arr[2],mm[1],arr[4]]
+                                util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                allaction_utils.append([util,act[0]]) 
+
+            elif act[0] == "CRAFT" and arr[1]!=0:
+                util=0
+                if arr[3] == "D":         #move and D
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            nextstate=[arr[0],arr[1]-1,arr[2],mm[1],arr[4]]
+                            util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                elif arr[3]=="R":
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"): #never reachess here 
+                                nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
+                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                            else:
+                                nextstate=[arr[0],arr[1]-1,arr[2],mm[1],arr[4]]
+                                util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                allaction_utils.append([util,act[0]])    
+
+            elif act[0] == "HIT": #hit  is possible
+                util=0
+                if arr[3] == "D":         #move and D
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            nextstate=[arr[0],arr[1],arr[2],mm[1],max(arr[4]-indi[1],0)]
                             if indi[1]>=arr[4]: #if game is over then you get reward 50
                                 rew=50
                             else:
                                 rew=0    
-                            util+=indi[0]*mm[0]*(stepcost+ rew + gamma*(gen1utils[count]))
+                            util+=indi[0]*mm[0]*(stepcost+ rew + gamma*getutility(nextstate))
 
                 elif arr[3]=="R":
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
-                            if mm[1]=="D" and (indi[1]=="E" or indi[1]=="C" or indi[1]=="W"):
-                                util+=indi[0]*mm[0]*(stepcost - 40 + gamma*(gen1utils[count]))    #indiana got hit 
+                            if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
+                                nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
+                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
                         
                             else:
+                                nextstate=[arr[0],arr[1],arr[2],mm[1],max(arr[4]-indi[1] ,0)]
                                 if indi[1]>=arr[4]: #if game is over then you get reward 50, and action is possible when mm doesn't shoot at me.
                                     rew=50
                                 else:
                                     rew=0 
-                                util+=indi[0]*mm[0]*(stepcost + gamma*(gen1utils[count]))
+                                util+=indi[0]*mm[0]*(stepcost + rew+ gamma*getutility(nextstate))
                 allaction_utils.append([util,act[0]])
-       
+
+            elif act[0] == "SHOOT" and arr[2] != 0:
+                util=0
+                if arr[3] == "D":         #move and D
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            nextstate=[arr[0],arr[1],arr[2]-1,mm[1],max(arr[4]-indi[1],0)]
+                            if indi[1]>=arr[4]: #if game is over then you get reward 50
+                                rew=50
+                            else:
+                                rew=0    
+                            util+=indi[0]*mm[0]*(stepcost+ rew + gamma*getutility(nextstate))
+
+                elif arr[3]=="R":
+                    for mm in possibility[arr[3]]: 
+                        for indi in act[1]:
+                            if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
+                                nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
+                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                        
+                            else:
+                                nextstate=[arr[0],arr[1],arr[2]-1,mm[1],max(arr[4]-indi[1],0)]
+                                if indi[1]>=arr[4]: #if game is over then you get reward 50, and action is possible when mm doesn't shoot at me.
+                                    rew=50
+                                else:
+                                    rew=0 
+                                util+=indi[0]*mm[0]*(stepcost + rew+ gamma*getutility(nextstate))
+                allaction_utils.append([util,act[0]])
+
         optimalactions[count]=getmax(allaction_utils,count)     
     return optimalvalues[count]
 
@@ -95,6 +181,14 @@ optimalvalues=[0 for i in range(600)]
 gen1utils=[0 for i in range(600)]
 gen2utils=[]
 over=1
+juststates=[]
+for a1 in pos:
+        for a2 in mat:
+            for a3 in arrows:
+                for a4 in mmstate:
+                    for a5 in health:
+                        juststates.append([a1,a2,a3,a4,a5])
+
 while(over):
     allstates=[]
     gen2utils=copy.deepcopy(gen1utils)
@@ -111,16 +205,16 @@ while(over):
     yeet=0
     iterations+=1
     for ok in range(count):
-        if gen2utils[ok]-gen1utils[ok] <= delta:
+        if (gen2utils[ok]-gen1utils[ok]) <= delta:
             yeet+=1 
             
     if yeet==600:
         over=0
-    for co in range(count):
-        print(allstates[co],optimalactions[co],optimalvalues[co])
-    print(count)    
-    if iterations >0:
-        over=0
-for i in range(10):
-    print(gen2utils[i], gen1utils[i])
-print("no.of iterations : ", iterations)
+    # for co in range(count):
+    #     print(allstates[co],optimalactions[co],optimalvalues[co])
+    #print(count)    
+    if iterations >130:
+        over=0  
+# for i in range(10):
+#     print(gen2utils[i], gen1utils[i])
+    print(iterations)
