@@ -195,7 +195,18 @@ for run in range(4):
     if run==3:
         gamma=0.25 #case3 task2
     else:
-        gamma=0.999           
+        gamma=0.999    
+
+    if run==0:
+        f = open("output/part_2_trace.txt", "w") 
+    elif run==1:
+        f = open("output/part_2_task_2.1_trace.txt", "w")
+    elif run==2:
+        f = open("output/part_2_task_2.2_trace.txt", "w") 
+    elif run==3:
+        f = open("output/part_2_task_2.3_trace.txt", "w")
+    else:
+        print("wrong run") 
     optimalactions=[0 for i in range(600)]#will be of latest gens 
     optimalvalues=[0 for i in range(600)]
     gen1utils=[0 for i in range(600)]
@@ -231,36 +242,14 @@ for run in range(4):
                 
         if yeet==600:
             over=0
-        if run==0:
-            f = open("output/part_2_trace.txt", "a")
-            f.write("{}{}\n".format("iteration = ",iterations))    
-            for co in range(count):
-                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']')) 
-            f.close()   
-        elif run==1:
-            f = open("output/part_2_task_2.1_trace.txt", "a")
-            f.write("{}{}\n".format("iteration = ",iterations)) 
-            for co in range(count):
-                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
-            f.close()   
-        elif run==2:
-            f = open("output/part_2_task_2.2_trace.txt", "a")
-            f.write("{}{}\n".format("iteration = ",iterations))    
-            for co in range(count):
-                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
-            f.close()  
-        elif run==3:
-            f = open("output/part_2_task_2.3_trace.txt", "a")
-            f.write("{}{}\n".format("iteration = ",iterations)) 
-            for co in range(count):
-                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
-            f.close()  
-        else:
-            printf("wrong run")          
-
-        if iterations >130:
+        
+        f.write("{}{}\n".format("iteration = ",iterations))    
+        for co in range(count):
+            f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))   
+        if iterations >300: #just a stop point in case
             over=0  
-        iterations+=1    
+        iterations+=1  
+    f.close()       
     # for i in range(10):
     #     print(gen2utils[i], gen1utils[i])
        
