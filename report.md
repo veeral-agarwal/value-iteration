@@ -63,16 +63,17 @@ It took 118 iterations(including initial one ) to converge, understandable as de
 
     No.of iterations to converge = 120
 
-Policy of other states where EAST wasn't the position of Indiana was almost same. So when indiana is at EAST and MM is ready to attack policy resulted in LEFT only for higher values of MM health.If health was<= 50, HIT or SHOOT were prefered.No.of iterations is almost nearly to older value(TASK 1).
+Policy of other states where EAST wasn't the position of Indiana was almost same. So when indiana is at EAST and MM is ready to attack policy resulted in LEFT only for higher values of MM health.If health was<= 50, HIT or SHOOT were prefered.No.of iterations is almost nearly to older value(TASK 1). For states (E,X,3,R,75)/(E,X,3,R,100), the previous course of action was to attack. Now the policy says move to the west as it is defensive and mm cannot harm to IJ in West, bringing the strategy into line with rationality
 
 ### CASE 2
 
     No.of iterations to converge = 57
 
-Almost all the states where we are not willing to attack resulted in STAY action.
+Almost all the states where we are not willing to attack resulted in STAY action. There are some states in NORTH and SOUTH, for both mm being ready and
+dormant, according to policy IJ will stay, which means the game can get stuck, the game will also continue if IJ is teleported to the east position when trying to remain/move.
 
 ### CASE 3
 
     No.of iterations to converge = 8
 
-Since the discount factor is reduced it leads to faster convergence.
+Since the discount factor is reduced it leads to faster convergence. In comparison to the original case, a lower gamma value allows quicker convergence. This is because the previous utilities' effect is diminished (because gamma is decreased), and since the payout stays stable most of the time (except when the mm dies and the game ends, in which case IJ receives a loss from the monster), the convergence is faster.
