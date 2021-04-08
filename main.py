@@ -198,13 +198,13 @@ for run in range(4):
         gamma=0.999    
 
     if run==0:
-        f = open("output/part_2_trace.txt", "w") 
+        f = open("./outputs/part_2_trace.txt", "w") 
     elif run==1:
-        f = open("output/part_2_task_2.1_trace.txt", "w")
+        f = open("./outputs/part_2_task_2.1_trace.txt", "w")
     elif run==2:
-        f = open("output/part_2_task_2.2_trace.txt", "w") 
+        f = open("./outputs/part_2_task_2.2_trace.txt", "w") 
     elif run==3:
-        f = open("output/part_2_task_2.3_trace.txt", "w")
+        f = open("./outputs/part_2_task_2.3_trace.txt", "w")
     else:
         print("wrong run") 
     optimalactions=[0 for i in range(600)]#will be of latest gens 
@@ -245,7 +245,7 @@ for run in range(4):
         
         f.write("{}{}\n".format("iteration = ",iterations))    
         for co in range(count):
-            f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))   
+            f.write("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\n".format('(',allstates[co][0],',',allstates[co][1],',',allstates[co][2],',',allstates[co][3],',',allstates[co][4],')',':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))   
         if iterations >300: #just a stop point in case
             over=0  
         iterations+=1  
