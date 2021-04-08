@@ -1,5 +1,6 @@
 # PART 2 : Value Iteration Algorithm
 
+## TASK 1
 ## INTERPRETATIONS AND COMMENTS
 
 1. #### CENTER
@@ -30,6 +31,7 @@
 
 
 ## ANALYSIS
+    No.of iteration to converge = 118
 We can see that our policy mostly match with our ideal expectations of risk averse person.When MM is in ready state Indiana is moving away to other safe position.This shows that Indiana is Risk-averse person.
 
 Since the discount factor is high this justifies that Indiana
@@ -39,21 +41,38 @@ It took 118 iterations(including initial one ) to converge, understandable as de
 
 
 ## SIMULATIONS
-1. START : (W,0,0,D,0)  iteration 118
+1. START : (W,0,0,D,0)  
 * SIMULATION 1:(W, 0, 0, D, 100) 
 * (W,0,0,D,100):RIGHT=[-221.23]
 * (C,0,0,D,100):RIGHT=[-202.633]
 * (E,0,0,R,100):HIT=[-231.155]
+* (E,0,0,D,50):[Indiana Got hit by MM]
 * (E,0,0,D,50):HIT=[-76.553]
 * (E,0,0,R,0):NONE=[0]
 
-2. START : (C,2,0,R,100) iteration 118
+2. START : (C,2,0,R,100) 
 * (C,2,0,R,100):UP=[-237.628]
 * (E,2,0,R,100):HIT=[-231.155]
-* (E,2,0,R,50):HIT=[-172.725]
+* (E,2,0,D,50):[Indiana got hit by MM]
+* (E,2,0,D,50):HIT=[-76.553]
 * (E,2,0,R,0):NONE=[0]
 
 
-## TASK2
-### INTERPRETATIONS AND COMMENTS
-You can export or print your document by firstly previewing the page (see Preview) and using your browsers default printing option which should allow you to export PDF, HTML or send to printer.
+## TASK 2
+### CASE 1
+
+    No.of iterations to converge = 120
+
+Policy of other states where EAST wasn't the position of Indiana was almost same. So when indiana is at EAST and MM is ready to attack policy resulted in LEFT only for higher values of MM health.If health was<= 50, HIT or SHOOT were prefered.No.of iterations is almost nearly to older value(TASK 1).
+
+### CASE 2
+
+    No.of iterations to converge = 57
+
+Almost all the states where we are not willing to attack resulted in STAY action.
+
+### CASE 3
+
+    No.of iterations to converge = 8
+
+Since the discount factor is reduced it leads to faster convergence.
