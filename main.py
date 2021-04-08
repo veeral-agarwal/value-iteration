@@ -250,7 +250,7 @@ for run in range(4):
         if iterations >150: #just a stop point in case
             over=0  
         iterations+=1  
-    print(iterations)    
+    # print(iterations)    
     f.close()       
     # for i in range(10):
     #     print(gen2utils[i], gen1utils[i])
