@@ -17,10 +17,18 @@ possibility={
     "D" : [[0.2,"R"],[0.8,"D"]],
     "R" : [[0.5,"D"],[0.5,"R"]] #this combination of RnD is shoot spot where you have to change ur reward function.
 }
+possibilitynew={         #for case1 task2
+    "C" : [["UP",[(0.85,"N"),(0.15,"E")]],["DOWN",[(0.85,"S"),(0.15,"E")]],["STAY",[(0.85,"C"),(0.15,"E")]],["RIGHT",[(1,"E")]],["LEFT",[(0.85,"W"),(0.15,"E")]],["SHOOT",[(0.5,25),(0.5,0)]],["HIT",[(0.1,50),(0.9,0)]]],
+    "N" : [["CRAFT",[(0.5,1),(0.35,2),(0.15,3)]],["STAY",[(0.85,"N"),(0.15,"E")]],["DOWN",[(0.85,"C"),(0.15,"E")]]],
+    "S" : [["GATHER",[(0.75,1),(0.25,0)]],["UP",[(0.85,"C"),(0.15,"E")]],["STAY",[(0.85,"S"),(0.15,"E")]]],
+    "W" : [["SHOOT",[(0.25,25),(0.75,0)]],["RIGHT",[(1,"C")]],["STAY",[(1,"W")]]],
+    "E" : [["SHOOT",[(0.9,25),(0.1,0)]],["HIT",[(0.2,50),(0.8,0)]],["LEFT",[(1,"W")]],["STAY",[(1,"E")]]],
+    "D" : [[0.2,"R"],[0.8,"D"]],
+    "R" : [[0.5,"D"],[0.5,"R"]] #this combination of RnD is shoot spot where you have to change ur reward function.
+}
 stepcost=-20
 delta=0.001
 iterations=0
-gamma=0.999
 #600 possible combinations 
 #for each comb calcualte util from bellman update eqn 
 #probbabilites maynot be idependent in few cases
@@ -52,32 +60,39 @@ def getmax(arr,count):
     optimalvalues[count]=arr[ind][0]
     return arr[ind][1]
 
-def updateutility(arr,count):
+def updateutility(arr,count,gamma,run):
     #get all actions first, and for each action get rew, util, prob and use bellman update
-    no_of_actions=len(possibility[arr[0]]) #matches with position here  , not using now
+    #no_of_actions=len(possibility[arr[0]]) #matches with position here  , not using now
     allaction_utils=[]
     if arr[4]==0:
         optimalactions[count]="NONE"
         optimalvalues[count]=0
     else:
-
-        for act in possibility[arr[0]]:
+        if run==1 and arr[0]=="E":        #case1 task 2
+            possibility1=possibilitynew
+        else:
+            possibility1=possibility    
+        for act in possibility1[arr[0]]:
             if act[0]=="UP" or act[0]=="DOWN" or act[0]=="RIGHT" or act[0]=="LEFT" or act[0]=="STAY" :  
                 util=0
+                if run==2 and act[0]=="STAY":    #case2 task2
+                    step_cost=0
+                else:
+                    step_cost=stepcost    
                 if arr[3] == "D":         #move and D
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
                             nextstate=[indi[1],arr[1],arr[2],mm[1],arr[4]]
-                            util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                            util+=indi[0]*mm[0]*(step_cost + gamma*getutility(nextstate))
                 elif arr[3]=="R":
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(step_cost - 40 + gamma*getutility(nextstate))    #indiana got hit 
                             else:
                                 nextstate=[indi[1],arr[1],arr[2],mm[1],arr[4]]
-                                util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
+                                util+=indi[0]*mm[0]*(step_cost + gamma*getutility(nextstate))
                 allaction_utils.append([util,act[0]])
 
             elif act[0]=="GATHER":
@@ -175,46 +190,77 @@ def updateutility(arr,count):
         optimalactions[count]=getmax(allaction_utils,count)     
     return optimalvalues[count]
 
-
-optimalactions=[0 for i in range(600)]#will be of latest gens 
-optimalvalues=[0 for i in range(600)]
-gen1utils=[0 for i in range(600)]
-gen2utils=[]
-over=1
-juststates=[]
-for a1 in pos:
-        for a2 in mat:
-            for a3 in arrows:
-                for a4 in mmstate:
-                    for a5 in health:
-                        juststates.append([a1,a2,a3,a4,a5])
-
-while(over):
-    allstates=[]
-    gen2utils=copy.deepcopy(gen1utils)
-    count=0
+#for 4 cases, first is normal 
+for run in range(4):
+    if run==3:
+        gamma=0.25 #case3 task2
+    else:
+        gamma=0.999           
+    optimalactions=[0 for i in range(600)]#will be of latest gens 
+    optimalvalues=[0 for i in range(600)]
+    gen1utils=[0 for i in range(600)]
+    gen2utils=[]
+    over=1
+    iterations=0
+    juststates=[]
     for a1 in pos:
-        for a2 in mat:
-            for a3 in arrows:
-                for a4 in mmstate:
-                    for a5 in health:
-                        allstates.append([a1,a2,a3,a4,a5])
-                        utility=updateutility([a1,a2,a3,a4,a5],count)
-                        gen1utils[count]=utility
-                        count+=1
-    yeet=0
-    iterations+=1
-    for ok in range(count):
-        if (gen2utils[ok]-gen1utils[ok]) <= delta:
-            yeet+=1 
-            
-    if yeet==600:
-        over=0
-    # for co in range(count):
-    #     print(allstates[co],optimalactions[co],optimalvalues[co])
-    #print(count)    
-    if iterations >130:
-        over=0  
-# for i in range(10):
-#     print(gen2utils[i], gen1utils[i])
-    print(iterations)
+            for a2 in mat:
+                for a3 in arrows:
+                    for a4 in mmstate:
+                        for a5 in health:
+                            juststates.append([a1,a2,a3,a4,a5])
+
+    while(over):
+        allstates=[]
+        gen2utils=copy.deepcopy(gen1utils)
+        count=0
+        for a1 in pos:
+            for a2 in mat:
+                for a3 in arrows:
+                    for a4 in mmstate:
+                        for a5 in health:
+                            allstates.append([a1,a2,a3,a4,a5])
+                            utility=updateutility([a1,a2,a3,a4,a5],count,gamma,run)
+                            gen1utils[count]=utility
+                            count+=1
+        yeet=0
+       
+        for ok in range(count):
+            if (gen2utils[ok]-gen1utils[ok]) <= delta:
+                yeet+=1 
+                
+        if yeet==600:
+            over=0
+        if run==0:
+            f = open("output/part_2_trace.txt", "a")
+            f.write("{}{}\n".format("iteration = ",iterations))    
+            for co in range(count):
+                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']')) 
+            f.close()   
+        elif run==1:
+            f = open("output/part_2_task_2.1_trace.txt", "a")
+            f.write("{}{}\n".format("iteration = ",iterations)) 
+            for co in range(count):
+                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
+            f.close()   
+        elif run==2:
+            f = open("output/part_2_task_2.2_trace.txt", "a")
+            f.write("{}{}\n".format("iteration = ",iterations))    
+            for co in range(count):
+                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
+            f.close()  
+        elif run==3:
+            f = open("output/part_2_task_2.3_trace.txt", "a")
+            f.write("{}{}\n".format("iteration = ",iterations)) 
+            for co in range(count):
+                f.write("{}{}{}{}{}{}{}\n".format(tuple(allstates[co]),':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))
+            f.close()  
+        else:
+            printf("wrong run")          
+
+        if iterations >130:
+            over=0  
+        iterations+=1    
+    # for i in range(10):
+    #     print(gen2utils[i], gen1utils[i])
+       
