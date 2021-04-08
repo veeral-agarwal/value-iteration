@@ -33,7 +33,7 @@ iterations=0
 #for each comb calcualte util from bellman update eqn 
 #probbabilites maynot be idependent in few cases
 # for every iteration take all possible actions and all rewards u get 
-# our step cost is -20
+# our step cost is -10
 
 def getutility(arr):
     #print(arr, "is array passed")
@@ -118,7 +118,7 @@ def updateutility(arr,count,gamma,run):
                 if arr[3] == "D":         #move and D
                     for mm in possibility[arr[3]]: 
                         for indi in act[1]:
-                            nextstate=[arr[0],arr[1]-1,arr[2],mm[1],arr[4]]
+                            nextstate=[arr[0],arr[1]-1,min(arr[2]+indi[1],3),mm[1],arr[4]]
                             util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
                 elif arr[3]=="R":
                     for mm in possibility[arr[3]]: 
@@ -127,7 +127,7 @@ def updateutility(arr,count,gamma,run):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
                                 util+=indi[0]*mm[0]*(stepcost- 40 + gamma*getutility(nextstate))    #indiana got hit 
                             else:
-                                nextstate=[arr[0],arr[1]-1,arr[2],mm[1],arr[4]]
+                                nextstate=[arr[0],arr[1]-1,min(arr[2]+indi[1],3),mm[1],arr[4]]
                                 util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
                 allaction_utils.append([util,act[0]])    
 
@@ -176,7 +176,7 @@ def updateutility(arr,count,gamma,run):
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 40+stepcost + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(-40 + stepcost + gamma*getutility(nextstate))    #indiana got hit 
                         
                             else:
                                 nextstate=[arr[0],arr[1],arr[2]-1,mm[1],max(arr[4]-indi[1],0)]
@@ -184,7 +184,7 @@ def updateutility(arr,count,gamma,run):
                                     rew=50
                                 else:
                                     rew=0 
-                                util+=indi[0]*mm[0]*(stepcost + rew+ gamma*getutility(nextstate))
+                                util+=indi[0]*mm[0]*(stepcost + rew + gamma*getutility(nextstate))
                 allaction_utils.append([util,act[0]])
 
         optimalactions[count]=getmax(allaction_utils,count)     
@@ -242,13 +242,15 @@ for run in range(4):
                 
         if yeet==600:
             over=0
-        
+        # for co in range(count):
+        #     print(allstates[co],optimalactions[co],optimalvalues[co])
         f.write("{}{}\n".format("iteration = ",iterations))    
         for co in range(count):
             f.write("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}\n".format('(',allstates[co][0],',',allstates[co][1],',',allstates[co][2],',',allstates[co][3],',',allstates[co][4],')',':',optimalactions[co],'=','[',round(optimalvalues[co],3),']'))   
-        if iterations >300: #just a stop point in case
+        if iterations >150: #just a stop point in case
             over=0  
         iterations+=1  
+    print(iterations)    
     f.close()       
     # for i in range(10):
     #     print(gen2utils[i], gen1utils[i])
