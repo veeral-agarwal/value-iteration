@@ -39,7 +39,21 @@ It took 118 iterations(including initial one ) to converge, understandable as de
 
 
 ## SIMULATIONS
-1. START : (W,0,0,D,0)
+1. START : (W,0,0,D,0)  iteration 118
+* SIMULATION 1:(W, 0, 0, D, 100) 
+* (W,0,0,D,100):RIGHT=[-221.23]
+* (C,0,0,D,100):RIGHT=[-202.633]
+* (E,0,0,R,100):HIT=[-231.155]
+* (E,0,0,D,50):HIT=[-76.553]
+* (E,0,0,R,0):NONE=[0]
+
+2. START : (C,2,0,R,100) iteration 118
+* (C,2,0,R,100):UP=[-237.628]
+* (E,2,0,R,100):HIT=[-231.155]
+* (E,2,0,R,50):HIT=[-172.725]
+* (E,2,0,R,0):NONE=[0]
+
+
 ## TASK2
 ### INTERPRETATIONS AND COMMENTS
 You can export or print your document by firstly previewing the page (see Preview) and using your browsers default printing option which should allow you to export PDF, HTML or send to printer.
