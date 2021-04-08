@@ -26,7 +26,7 @@ possibilitynew={         #for case1 task2
     "D" : [[0.2,"R"],[0.8,"D"]],
     "R" : [[0.5,"D"],[0.5,"R"]] #this combination of RnD is shoot spot where you have to change ur reward function.
 }
-stepcost=-20
+stepcost=-10
 delta=0.001
 iterations=0
 #600 possible combinations 
@@ -107,7 +107,7 @@ def updateutility(arr,count,gamma,run):
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(stepcost- 40 + gamma*getutility(nextstate))    #indiana got hit 
                             else:
                                 nextstate=[arr[0],min(arr[1]+indi[1],2),arr[2],mm[1],arr[4]]
                                 util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
@@ -125,7 +125,7 @@ def updateutility(arr,count,gamma,run):
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"): #never reachess here 
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(stepcost- 40 + gamma*getutility(nextstate))    #indiana got hit 
                             else:
                                 nextstate=[arr[0],arr[1]-1,arr[2],mm[1],arr[4]]
                                 util+=indi[0]*mm[0]*(stepcost + gamma*getutility(nextstate))
@@ -148,7 +148,7 @@ def updateutility(arr,count,gamma,run):
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(stepcost - 40 + gamma*getutility(nextstate))    #indiana got hit 
                         
                             else:
                                 nextstate=[arr[0],arr[1],arr[2],mm[1],max(arr[4]-indi[1] ,0)]
@@ -176,7 +176,7 @@ def updateutility(arr,count,gamma,run):
                         for indi in act[1]:
                             if mm[1]=="D" and (arr[0]=="E" or arr[0]=="C"):
                                 nextstate=[arr[0],arr[1],0,mm[1],min(arr[4]+25,100)]
-                                util+=indi[0]*mm[0]*(- 60 + gamma*getutility(nextstate))    #indiana got hit 
+                                util+=indi[0]*mm[0]*(- 40+stepcost + gamma*getutility(nextstate))    #indiana got hit 
                         
                             else:
                                 nextstate=[arr[0],arr[1],arr[2]-1,mm[1],max(arr[4]-indi[1],0)]
