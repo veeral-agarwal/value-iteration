@@ -1,4 +1,6 @@
-# PART 2 : Value Iteration Algorithm
+# Value Iteration Algorithm
+
+(part 2 in pdf)
 
 ## TASK 1
 ## INTERPRETATIONS AND COMMENTS
